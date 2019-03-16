@@ -2,16 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
-
-
+const port = process.env.PORT || 5000;
 const items = require('./Routes/api/items');
-
 const app = express();
 
 
 //BodyParser Middleware
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 //DB config
 
@@ -28,7 +28,6 @@ mongoose.connect(db)
 	app.use('/api/items',items);
 
 
-	const port = process.env.PORT || 5000;
 
 	if (process.env.NODE_ENV === 'production') {
 	  // Serve any static files
