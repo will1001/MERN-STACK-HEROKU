@@ -1,35 +1,42 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
-const app = express();
 const port = process.env.PORT || 5000;
+const items = require('./Routes/api/items');
+const app = express();
 
+
+//BodyParser Middleware
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
+//DB config
 
-// API calls
-app.get('/api/hello', (req, res) => {
-  res.send({ express: 'Hello From Express' });
-});
-app.post('/api/world', (req, res) => {
-  console.log(req.body);
-  res.send(
-    `I received your POST request. This is what you sent me: ${req.body.post}`,
-  );
-});
+const db = require('./config/keys').mongoURI;
 
+// Connect to Mongo
 
-if (process.env.NODE_ENV === 'production') {
-  // Serve any static files
-  app.use(express.static(path.join(__dirname, 'client/build')));
-  // Handle React routing, return all requests to React app
-  app.get('*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-  });
-}
+mongoose.connect(db)
+	.then(()=> console.log('connected . . .'))
+	.catch(err => console.log(err));
+
+	//Use Routes
+
+	app.use('/api/items',items);
 
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+
+	if (process.env.NODE_ENV === 'production') {
+	  // Serve any static files
+	  app.use(express.static(path.join(__dirname, 'client/build')));
+	  // Handle React routing, return all requests to React app
+	  app.get('*', function(req, res) {
+	    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+	  });
+	}
+
+	app.listen(port,()=> console.log('Server started on port :' + port));
+
